@@ -1,0 +1,19 @@
+{
+  "name": "advent-of-code-2024",
+  "version": "1.0.0",
+  "description": "Advent of Code 2024 Solutions",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "day": "ts-node src/run-day.ts",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": ["advent-of-code"],
+  "author": "Dan Kollar",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.7.2"
+  }
+}
