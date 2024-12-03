@@ -5,7 +5,7 @@ import { readInput } from "../../utils/input";
  * @param useTestInput - Whether to use the test input or the actual input
  * @returns The sum of the multiplication results
  *
- * test-input.txt result: 48
+ * part2-test-input.txt result: 48
  * input.txt result: 76911921
  */
 function solve(useTestInput: boolean = false): number {
