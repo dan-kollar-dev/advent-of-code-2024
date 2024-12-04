@@ -6,7 +6,7 @@ import { readInput } from "../../utils/input";
  * @returns The number of safe reports
  * 
  * test-input.txt result: 2
- * input.txt result: 502
+ * input.txt result: ???
  */
 function solve(useTestInput: boolean = false): number {
   const input = readInput({ day: 2, isTest: useTestInput });

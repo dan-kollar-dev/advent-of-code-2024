@@ -30,3 +30,6 @@ Thumbs.db
 **/*input*.txt
 **/*prompt*.txt
 **/*solution*.txt
+
+# Allow test input files
+!**/*test-input*.txt

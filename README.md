@@ -35,12 +35,11 @@ npm run day 1 2 test
 - `src/utils/`: Shared utility functions
 - `src/days/`: Individual day solutions
 - Each day folder contains:
-  - `input.txt`: Puzzle input
-  - `part1-prompt.txt`: Description of Part 1
   - `part1.ts`: Solution file for Part 1
-  - `part2-prompt.txt`: Description of Part 2
   - `part2.ts`: Solution file for Part 2
   - `test-input.txt`: Test input
+
+Note that in order to run the solutions, you will need to add your puzzle input to an `input.txt` file in each day's folder.
 
 ## Utilities
 Utility functions are available in `src/utils/` to help with common tasks like:
