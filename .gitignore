@@ -27,5 +27,5 @@ yarn-error.log*
 Thumbs.db
 
 # Ignore text files containing 'input' or 'prompt'
-*input*.txt
-*prompt*.txt
+**/*input*.txt
+**/*prompt*.txt
