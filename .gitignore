@@ -25,3 +25,7 @@ yarn-error.log*
 # OS generated files
 .DS_Store
 Thumbs.db
+
+# Ignore text files containing 'input' or 'prompt'
+**/*input*.txt
+**/*prompt*.txt
