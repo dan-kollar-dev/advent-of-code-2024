@@ -6,7 +6,7 @@ import { readInput } from "../../utils/input";
  * @returns The total distance between the two lists
  * 
  * test-input.txt result: 11
- * input.txt result: 2066446
+ * input.txt result: ???
  */
 function solve(useTestInput: boolean = false): number {
   const input = readInput({ day: 1, isTest: useTestInput });

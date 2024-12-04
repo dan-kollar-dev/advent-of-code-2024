@@ -6,7 +6,7 @@ import { readInput } from "../../utils/input";
  * @returns The sum of the multiplication results
  *
  * part2-test-input.txt result: 48
- * input.txt result: 76911921
+ * input.txt result: ???
  */
 function solve(useTestInput: boolean = false): number {
   const input = readInput({ day: 3, isTest: useTestInput, part: 2 });

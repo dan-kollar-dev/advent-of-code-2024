@@ -6,7 +6,7 @@ import { readInput } from "../../utils/input";
  * @returns The total similarity score of the two lists
  * 
  * test-input.txt result: 31
- * input.txt result: 24931009
+ * input.txt result: ???
  */
 function solve(useTestInput: boolean = false): number {
   const input = readInput({ day: 1, isTest: useTestInput });
