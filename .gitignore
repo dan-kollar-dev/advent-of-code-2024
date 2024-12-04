@@ -26,6 +26,7 @@ yarn-error.log*
 .DS_Store
 Thumbs.db
 
-# Ignore text files containing 'input' or 'prompt'
+# Ignore helper files that shouldn't be committed
 **/*input*.txt
 **/*prompt*.txt
+**/*solution*.txt
