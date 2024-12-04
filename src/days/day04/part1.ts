@@ -5,7 +5,7 @@ import { readInput } from "../../utils/input";
  * @param useTestInput - Whether to use the test input or the actual input
  * @returns The number of safe reports
  * 
- * test-input.txt result: ???
+ * test-input.txt result: 18
  * input.txt result: ???
  */
 function solve(useTestInput: boolean = false): number {
