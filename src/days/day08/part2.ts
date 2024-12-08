@@ -156,7 +156,7 @@ function solve(useTestInput: boolean = false): number {
 
 // If this file is run directly
 if (require.main === module) {
-  console.log("Part 1 Solution:", solve());
+  console.log("Part 2 Solution:", solve());
 }
 
 export default solve;
