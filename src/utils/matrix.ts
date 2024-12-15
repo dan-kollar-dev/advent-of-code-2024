@@ -1,3 +1,8 @@
+/**
+ * Rotates a matrix 90 degrees clockwise
+ * @param matrix - The matrix to rotate
+ * @returns The rotated matrix
+ */
 export function rotateMatrix<T>(matrix: T[][]): T[][] {
   const rows = matrix.length;
   const cols = matrix[0]?.length || 0;
