@@ -5,20 +5,25 @@ interface Coordinates {
   y: number;
 }
 
+interface Road {
+  coordinates: Coordinates;
+  index: number;
+  minPicoseconds: number;
+}
+
 let START: Coordinates;
 let END: Coordinates;
 
 let WIDTH: number;
 let HEIGHT: number;
 
-let BASE_MIN_PICOSECONDS: number;
-
 const WALL_MAP = new Map<string, number>();
-const ROAD_MAP = new Map<string, { index: number; minPicoseconds: number }>();
+const ROAD_MAP = new Map<string, Road>();
 
-let CURRENT_WALL_MAP = new Map<string, number>();
-let CURRENT_ROAD_MAP = new Map<string, { index: number; minPicoseconds: number }>();
-
+/**
+ * Parses the input and populates the WALL_MAP and ROAD_MAP
+ * @param input - The input string
+ */
 function parseInput(input: string): void {
   let wallIndex = 0;
   let roadIndex = 0;
@@ -36,6 +41,7 @@ function parseInput(input: string): void {
       }
       if (char === ".") {
         ROAD_MAP.set(`${x},${y}`, {
+          coordinates: { x, y },
           index: roadIndex,
           minPicoseconds: Infinity,
         });
@@ -44,6 +50,7 @@ function parseInput(input: string): void {
       }
       if (char === "S") {
         ROAD_MAP.set(`${x},${y}`, {
+          coordinates: { x, y },
           index: roadIndex,
           minPicoseconds: Infinity,
         });
@@ -53,6 +60,7 @@ function parseInput(input: string): void {
       }
       if (char === "E") {
         ROAD_MAP.set(`${x},${y}`, {
+          coordinates: { x, y },
           index: roadIndex,
           minPicoseconds: Infinity,
         });
@@ -64,9 +72,17 @@ function parseInput(input: string): void {
   }
 }
 
+/**
+ * Logs the map to the console
+ * @param wallMap - The wall map
+ * @param roadMap - The road map
+ */
 function logMap(
   wallMap: Map<string, number>,
-  roadMap: Map<string, { index: number; minPicoseconds: number }>
+  roadMap: Map<
+    string,
+    Road
+  >
 ): void {
   for (let y = 0; y < HEIGHT; y++) {
     let row = "";
@@ -91,110 +107,61 @@ function logMap(
   }
 }
 
-function move({
-  currentPosition,
-  picoseconds,
-}: {
-  currentPosition: Coordinates;
-  picoseconds: number;
-}): void {
-  console.log("Moving to", currentPosition, "with picoseconds", picoseconds);
-  const { x, y } = currentPosition;
+/**
+ * Gets the next road to move to
+ * @param currentRoad - The current road
+ * @returns The next road
+ */
+function getNextRoad(currentRoad: Road): Road {
+  const { x, y } = currentRoad.coordinates;
 
-  // Out of bounds
-  if (x > WIDTH || y > HEIGHT) {
-    // console.log("Out of bounds");
-    return;
+  const northRoad = ROAD_MAP.get(`${x},${y - 1}`);
+  const southRoad = ROAD_MAP.get(`${x},${y + 1}`);
+  const eastRoad = ROAD_MAP.get(`${x + 1},${y}`);
+  const westRoad = ROAD_MAP.get(`${x - 1},${y}`);
+
+  const roads = [northRoad, southRoad, eastRoad, westRoad].filter(
+    (road) => road !== undefined && road.minPicoseconds === Infinity
+  );
+
+  if (roads.length === 0) {
+    throw new Error("No roads found");
   }
 
-  // Hit a wall
-  if (CURRENT_WALL_MAP.has(`${x},${y}`)) {
-    // console.log("Hit a wall");
-    return;
+  if (roads.length > 1) {
+    throw new Error("Multiple roads found");
   }
 
-  // Current position has already been visited with a lower picoseconds value
-  if (CURRENT_ROAD_MAP.get(`${x},${y}`)?.minPicoseconds! <= picoseconds) {
-    // console.log("Already visited with a lower picoseconds value");
-    return;
-  }
-
-  // Update the road map
-  CURRENT_ROAD_MAP.set(`${x},${y}`, {
-    index: CURRENT_ROAD_MAP.size,
-    minPicoseconds: picoseconds,
-  });
-
-  if (x === END.x && y === END.y) {
-    // console.log("Reached the end");
-    return;
-  }
-
-  // Move up
-  move({
-    currentPosition: { x, y: y - 1 },
-    picoseconds: picoseconds + 1,
-  });
-
-  // Move right
-  move({
-    currentPosition: { x: x + 1, y },
-    picoseconds: picoseconds + 1,
-  });
-
-  // Move down
-  move({
-    currentPosition: { x, y: y + 1 },
-    picoseconds: picoseconds + 1,
-  });
-
-  // Move left
-  move({
-    currentPosition: { x: x - 1, y },
-    picoseconds: picoseconds + 1,
-  });
+  return roads[0]!;
 }
 
-function isRemovable(wall: string): boolean {
-  const [x, y] = wall.split(",").map(Number);
+/**
+ * Races the race
+ */
+function race(): void {
+  let currentRoad = ROAD_MAP.get(`${START.x},${START.y}`);
+  let currentPicoseconds = 0;
 
-  // Not removable if on the edge
-  if (x === 0 || y === 0 || x === WIDTH - 1 || y === HEIGHT - 1) {
-    return false;
+  while (currentRoad) {
+    if (currentRoad === undefined) {
+      throw new Error("Current road not found");
+    }
+
+    currentRoad.minPicoseconds = currentPicoseconds;
+
+    if (currentRoad.index === ROAD_MAP.get(`${END.x},${END.y}`)?.index) {
+      break;
+    }
+
+    currentRoad = getNextRoad(currentRoad);
+    currentPicoseconds += 1;
   }
-
-  // // Not removable if it's a corner
-  // if (WALL_MAP.has(`${x - 1},${y - 1}`) && WALL_MAP.has(`${x - 1},${y + 1}`)) {
-  //   return false;
-  // }
-
-  // // Not removable if surrounded by walls
-  // if (
-  //   WALL_MAP.has(`${x - 1},${y}`) &&
-  //   WALL_MAP.has(`${x + 1},${y}`) &&
-  //   WALL_MAP.has(`${x},${y - 1}`) &&
-  //   WALL_MAP.has(`${x},${y + 1}`)
-  // ) {
-  //   return false;
-  // }
-
-  // // Not removable if neither N/S adjacent or E/W adjacent are not walls
-  // if (
-  //   !(
-  //     (!WALL_MAP.has(`${x},${y - 1}`) && !WALL_MAP.has(`${x},${y + 1}`)) ||
-  //     (!WALL_MAP.has(`${x - 1},${y}`) && !WALL_MAP.has(`${x + 1},${y}`))
-  //   )
-  // ) {
-  //   return false;
-  // }
-
-  return true;
 }
 
 /**
  * Solves the first part of the day 20 challenge
  * @param useTestInput - Whether to use the test input or the actual input
- * @returns The number of safe reports
+ * @returns The number of cheats that would save at least 100 picoseconds
  * 
  * test-input.txt result:
     There are 14 cheats that save 2 picoseconds.
@@ -213,90 +180,66 @@ function isRemovable(wall: string): boolean {
 function solve(useTestInput: boolean = false): number {
   const input = readInput({ day: 20, isTest: useTestInput });
 
+  const minPicosecondsSaved = useTestInput ? 10 : 100;
+
   parseInput(input);
 
-  // Establish the base minimum picoseconds
-  CURRENT_WALL_MAP = new Map(WALL_MAP);
-  CURRENT_ROAD_MAP = new Map(ROAD_MAP);
-
-  move({
-    currentPosition: START,
-    picoseconds: 0,
-  });
-
-  BASE_MIN_PICOSECONDS = CURRENT_ROAD_MAP.get(`${END.x},${END.y}`)?.minPicoseconds!;
+  race();
 
   // Initialize the cheat map
   const cheatMap = new Map<number, number>();
 
-  // Check cheats by removing each wall
+  // Check cheats by maximum time saved by removing each wall
   for (const [key, _value] of WALL_MAP) {
-    console.log("--------------------------------");
-    console.log("Checking wall:", key);
-    // Check if the wall is removable
-    if (!isRemovable(key)) {
-      console.log("Wall is not removable:", key);
-      continue;
+    const [x, y] = key.split(",").map(Number);
+    
+    // Check time saved east/west if we remove the wall
+    const eastRoad = ROAD_MAP.get(`${x + 1},${y}`);
+    const westRoad = ROAD_MAP.get(`${x - 1},${y}`);
+    let eastWestTimeSaved = 0;
+    if (eastRoad !== undefined && westRoad !== undefined) {
+      eastWestTimeSaved = Math.abs(
+        eastRoad.minPicoseconds - westRoad.minPicoseconds
+      );
     }
 
-    console.log("Wall is removable:", key);
-    CURRENT_WALL_MAP = new Map(WALL_MAP);
-    CURRENT_ROAD_MAP = new Map(ROAD_MAP);
-
-    // Remove the wall
-    CURRENT_WALL_MAP.delete(key);
-
-    // Add the road
-    CURRENT_ROAD_MAP.set(key, {
-      index: CURRENT_ROAD_MAP.size,
-      minPicoseconds: Infinity,
-    });
-
-    if (key === "6,7") {
-      logMap(CURRENT_WALL_MAP, CURRENT_ROAD_MAP);
+    // Check time saved north/south if we remove the wall
+    const northRoad = ROAD_MAP.get(`${x},${y - 1}`);
+    const southRoad = ROAD_MAP.get(`${x},${y + 1}`);
+    let northSouthTimeSaved = 0;
+    if (northRoad !== undefined && southRoad !== undefined) {
+      northSouthTimeSaved = Math.abs(
+        northRoad.minPicoseconds - southRoad.minPicoseconds
+      );
     }
 
-    // Run the updated course
-    move({
-      currentPosition: START,
-      picoseconds: 0,
-    });
-
-    // Get the minimum picoseconds to reach the end
-    const minPicoseconds = CURRENT_ROAD_MAP.get(`${END.x},${END.y}`)
-      ?.minPicoseconds!;
-    console.log("Min picoseconds:", minPicoseconds);
-
-    // Calculate the picoseconds saved
-    const picosecondsSaved = BASE_MIN_PICOSECONDS - minPicoseconds;
-
-    // Add the result to the cheat map if the picoseconds saved is greater than 0
-    if (picosecondsSaved > 0) {
-      cheatMap.set(picosecondsSaved, (cheatMap.get(picosecondsSaved) ?? 0) + 1);
+    // Calculate the time saved by removing the wall and add to the cheat map
+    const timeSaved = Math.max(eastWestTimeSaved, northSouthTimeSaved) - 2; // -2 to account for the cut
+    if (timeSaved > 0) {
+      cheatMap.set(timeSaved, (cheatMap.get(timeSaved) ?? 0) + 1);
     }
   }
 
-  const sortedCheatMapEntries = Array.from(cheatMap.entries()).sort(
-    ([keyA], [keyB]) => keyA - keyB
-  );
-
-  for (const [picosecondsSaved, count] of sortedCheatMapEntries) {
-    console.log(
-      `There are ${count} cheats that save ${picosecondsSaved} picoseconds.`
-    );
-  }
+  // Log the cheats
+  // const sortedCheatMapEntries = Array.from(cheatMap.entries()).sort(
+  //   ([keyA], [keyB]) => keyA - keyB
+  // );
+  // for (const [picosecondsSaved, count] of sortedCheatMapEntries) {
+  //   console.log(
+  //     `There are ${count} cheats that save ${picosecondsSaved} picoseconds.`
+  //   );
+  // }
 
   let cheatCount = 0;
 
-  // Iterate over the Map
+  // Iterate over the cheat map
   for (const [key, value] of cheatMap) {
-    // Check if the key is greater than or equal to 10
-    if (key >= 100) {
-      cheatCount += value; // Accumulate the value
+    // Check if the key is greater than or equal to minPicosecondsSaved
+    if (key >= minPicosecondsSaved) {
+      cheatCount += value;
     }
   }
 
-  // logMap(WALL_MAP, ROAD_MAP);
   return cheatCount;
 }
 
